@@ -47,13 +47,13 @@ public class SingletonMonobehavior<T> : MonoBehaviour where T : MonoBehaviour
             _instance = this as T;
             return;
         }
-        else if(Instance == this)
+        else if (Instance == this)
         {
             return;
         }
 
         Destroy(gameObject);
 
-        
+
     }
 }

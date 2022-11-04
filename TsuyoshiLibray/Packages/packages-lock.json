@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.sample.samplepackage": {
+    "com.qesulive.samplepackage": {
       "version": "file:TsuyoshiLibrary",
       "depth": 0,
       "source": "embedded",

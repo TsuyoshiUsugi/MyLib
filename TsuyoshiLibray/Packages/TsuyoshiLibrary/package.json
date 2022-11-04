@@ -1,10 +1,11 @@
 {
-  "name": "com.sample.samplepackage",
-  "displayName": "SamplePackage",
+  "name": "com.qesulive.samplepackage",
+  "displayName": "TsuyoshiPackage",
   "version": "0.1.0",
-  "unity": "2020.1",
-  "description": "description.",
+  "unity": "2021.3",
+  "description": "Tsuyoshi's Package.",
   "author": {
     "name": "SamplePackage"
-  }
+  },
+  "type": "library"
 }
