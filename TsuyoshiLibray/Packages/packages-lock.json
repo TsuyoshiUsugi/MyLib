@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.sample.samplepackage": {
-      "version": "file:Sample",
+      "version": "file:TsuyoshiLibrary",
       "depth": 0,
       "source": "embedded",
       "dependencies": {}
