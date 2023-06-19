@@ -1,6 +1,8 @@
 using System.Linq;
 using UnityEngine;
 using System.Collections.Generic;
+using System.Reflection;
+using Codice.CM.Common.Serialization.Replication;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -12,8 +14,7 @@ using UnityEditor;
 /// </summary>
 public class CustomTagRepository : ScriptableObject
 {
-    [SerializeField, Header("このファイルのPath")] string _assetDataPath = string.Empty;
-    static string _staticAssetDataPath;
+    [SerializeField, Header("このファイルのPath")] public static string StaticAssetDataPath;
 
     private static CustomTagRepository _repository = null;
 
@@ -26,7 +27,7 @@ public class CustomTagRepository : ScriptableObject
             {
                 _repository =
                     AssetDatabase.LoadAssetAtPath<CustomTagRepository>(
-                        _staticAssetDataPath);
+                        StaticAssetDataPath);
             }
 #endif
             return _repository;
@@ -43,12 +44,14 @@ public class CustomTagRepository : ScriptableObject
     {
         return Instance.GetAllTags().Where(t => t.IndexOf(currentText) != -1).ToList();
     }
-
-    [ExecuteAlways] 
-    public void ExecuteAlways()
+ 
+    /// <summary>
+    /// AssetDataPathをロードする
+    /// </summary>
+    public static void SetAssetDataPath()
     {
-        _staticAssetDataPath = UnityEngine.Application.dataPath + System.IO.Path.GetFileName(UnityEngine.Application.dataPath);
-        Debug.Log(_staticAssetDataPath);
+        Assembly assembly = Assembly.GetExecutingAssembly();
+        StaticAssetDataPath = assembly.Location;
     }
 
 #endif
@@ -72,3 +75,24 @@ public class CustomTagRepository : ScriptableObject
         return _tags;
     }
 }
+
+#if UNITY_EDITOR
+/// <summary>
+/// タグのリポジトリのパスを変更する
+/// </summary>
+public class CustomAssetProcessor : AssetPostprocessor
+{
+    private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
+    {
+        foreach (var item in importedAssets)
+        {
+            CustomTagRepository.StaticAssetDataPath = item;
+        }
+        
+        foreach (var item in movedAssets)
+        {
+            CustomTagRepository.StaticAssetDataPath = item;
+        }
+    }
+}
+#endif
