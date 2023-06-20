@@ -58,7 +58,7 @@ namespace TsuyoshiLibrary
 
 #endif
 
-        [SerializeField, Header("ここでタグ名を変更しても使われてるタグまで変更できません。変更は自己責任で。")]
+        [SerializeField, ReadOnly]
         private List<string> _tags = new List<string>();
 
         public static bool Contains(string tag)
