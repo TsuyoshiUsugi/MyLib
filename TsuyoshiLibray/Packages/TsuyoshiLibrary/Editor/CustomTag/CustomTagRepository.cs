@@ -6,100 +6,104 @@ using System.Reflection;
 using UnityEditor;
 #endif
 
-[CreateAssetMenu(menuName = "TsuyoshiLibrary/Tag/CustomTagRepository")]
-/// <summary>
-/// CustomTag のマスターリポジトリ
-/// 二つ以上存在出来ないようにsingletonなクラスになっている
-/// </summary>
-public class CustomTagRepository : ScriptableObject
+
+namespace TsuyoshiLibrary
 {
-    [SerializeField, Header("このファイルのPath")] public static string StaticAssetDataPath;
-
-    private static CustomTagRepository _repository = null;
-
-    public static CustomTagRepository Instance
+    [CreateAssetMenu(menuName = "TsuyoshiLibrary/Tag/CustomTagRepository")]
+    /// <summary>
+    /// CustomTag のマスターリポジトリ
+    /// 二つ以上存在出来ないようにsingletonなクラスになっている
+    /// </summary>
+    public class CustomTagRepository : ScriptableObject
     {
-        get
+        [SerializeField, Header("このファイルのPath")] public static string StaticAssetDataPath;
+
+        private static CustomTagRepository _repository = null;
+
+        public static CustomTagRepository Instance
         {
-#if UNITY_EDITOR
-            if (_repository == null)
+            get
             {
-                _repository =
-                    AssetDatabase.LoadAssetAtPath<CustomTagRepository>(
-                        StaticAssetDataPath);
+#if UNITY_EDITOR
+                if (_repository == null)
+                {
+                    _repository =
+                        AssetDatabase.LoadAssetAtPath<CustomTagRepository>(
+                            StaticAssetDataPath);
+                }
+#endif
+                return _repository;
             }
+        }
+
+#if UNITY_EDITOR
+        /// <summary>
+        /// 現在登録されている全てのタグを取ってくる
+        /// </summary>
+        /// <param name="currentText"></param>
+        /// <returns></returns>
+        public static List<string> GetCandidates(string currentText)
+        {
+            return Instance.GetAllTags().Where(t => t.IndexOf(currentText) != -1).ToList();
+        }
+
+        /// <summary>
+        /// AssetDataPathをロードする
+        /// </summary>
+        public static void SetAssetDataPath()
+        {
+            Assembly assembly = Assembly.GetExecutingAssembly();
+            StaticAssetDataPath = assembly.Location;
+        }
+
 #endif
-            return _repository;
+
+        [SerializeField, Header("ここでタグ名を変更しても使われてるタグまで変更できません。変更は自己責任で。")]
+        private List<string> _tags = new List<string>();
+
+        public static bool Contains(string tag)
+        {
+            return Instance._tags.Contains(tag);
+        }
+
+        public void AddNewTag(string name)
+        {
+            if (_tags.Contains(name)) return;
+            _tags.Add(name);
+        }
+
+        public IEnumerable<string> GetAllTags()
+        {
+            return _tags;
         }
     }
 
 #if UNITY_EDITOR
     /// <summary>
-    /// 現在登録されている全てのタグを取ってくる
+    /// タグのリポジトリのパスを変更する
     /// </summary>
-    /// <param name="currentText"></param>
-    /// <returns></returns>
-    public static List<string> GetCandidates(string currentText)
+    public class CustomAssetProcessor : AssetPostprocessor
     {
-        return Instance.GetAllTags().Where(t => t.IndexOf(currentText) != -1).ToList();
-    }
- 
-    /// <summary>
-    /// AssetDataPathをロードする
-    /// </summary>
-    public static void SetAssetDataPath()
-    {
-        Assembly assembly = Assembly.GetExecutingAssembly();
-        StaticAssetDataPath = assembly.Location;
-    }
-
-#endif
-
-    [SerializeField, Header("ここでタグ名を変更しても使われてるタグまで変更できません。変更は自己責任で。")]
-    private List<string> _tags = new List<string>();
-
-    public static bool Contains(string tag)
-    {
-        return Instance._tags.Contains(tag);
-    }
-
-    public void AddNewTag(string name)
-    {
-        if (_tags.Contains(name)) return;
-        _tags.Add(name);
-    }
-
-    public IEnumerable<string> GetAllTags()
-    {
-        return _tags;
-    }
-}
-
-#if UNITY_EDITOR
-/// <summary>
-/// タグのリポジトリのパスを変更する
-/// </summary>
-public class CustomAssetProcessor : AssetPostprocessor
-{
-    private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
-    {
-        foreach (var path in importedAssets)
+        private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
         {
-            if (!path.Contains(".asset")) return;
-            if (path.Contains("CustomTagRepository")) return;
+            foreach (var path in importedAssets)
+            {
+                if (!path.Contains(".asset")) return;
+                if (path.Contains("CustomTagRepository")) return;
 
-            CustomTagRepository.StaticAssetDataPath = path;
-            Debug.LogError("CustomTagRepositoryが作られました");
-        }
+                CustomTagRepository.StaticAssetDataPath = path;
+                Debug.LogError("CustomTagRepositoryが作られました");
+            }
 
-        foreach (var path in movedAssets)
-        {
-            if (!path.Contains(".asset")) return;
-            if (path.Contains("CustomTagRepository")) return;
+            foreach (var path in movedAssets)
+            {
+                if (!path.Contains(".asset")) return;
+                if (path.Contains("CustomTagRepository")) return;
 
-            CustomTagRepository.StaticAssetDataPath = path;
-            Debug.LogError("CustomTagRepositoryの場所が移動されました。");
+                CustomTagRepository.StaticAssetDataPath = path;
+                Debug.LogError("CustomTagRepositoryの場所が移動されました。");
+            }
         }
     }
-}
 #endif
+}
