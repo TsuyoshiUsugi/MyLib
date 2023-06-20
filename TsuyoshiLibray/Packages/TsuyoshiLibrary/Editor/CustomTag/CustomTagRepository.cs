@@ -2,7 +2,6 @@ using System.Linq;
 using UnityEngine;
 using System.Collections.Generic;
 using System.Reflection;
-using Codice.CM.Common.Serialization.Replication;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -84,14 +83,22 @@ public class CustomAssetProcessor : AssetPostprocessor
 {
     private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths)
     {
-        foreach (var item in importedAssets)
+        foreach (var path in importedAssets)
         {
-            CustomTagRepository.StaticAssetDataPath = item;
+            if (!path.Contains(".asset")) return;
+            if (path.Contains("CustomTagRepository")) return;
+
+            CustomTagRepository.StaticAssetDataPath = path;
+            Debug.LogError("CustomTagRepositoryÇ™çÏÇÁÇÍÇ‹ÇµÇΩ");
         }
-        
-        foreach (var item in movedAssets)
+
+        foreach (var path in movedAssets)
         {
-            CustomTagRepository.StaticAssetDataPath = item;
+            if (!path.Contains(".asset")) return;
+            if (path.Contains("CustomTagRepository")) return;
+
+            CustomTagRepository.StaticAssetDataPath = path;
+            Debug.LogError("CustomTagRepositoryÇÃèÍèäÇ™à⁄ìÆÇ≥ÇÍÇ‹ÇµÇΩÅB");
         }
     }
 }

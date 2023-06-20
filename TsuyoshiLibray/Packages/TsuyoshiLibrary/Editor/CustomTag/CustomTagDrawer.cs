@@ -5,11 +5,11 @@ using TsuyoshiLibrary;
 /// <summary>
 /// Control Editor of SkillCategoryTagCollection
 /// </summary>
-[CustomPropertyDrawer(typeof(CustomTag), true)]
+[CustomPropertyDrawer(typeof(CustomTag), true)]  //プロパティとして定義されたクラスのインスペクタ上の表現を変える
 public class CustomTagDrawer : PropertyDrawer
 {
     private CustomTagCandiudatePopup toolTip;
-    static private GUIContent registButton = new GUIContent("Regist", "このタグをリポジトリに登録");
+    static private GUIContent registButton = new GUIContent("Regist", "このタグをリポジトリに登録");　//何をレンダリングするか定義する
     static private GUIStyle attentionStyle;
     private int index = -1;
     static CustomTagDrawer()
