@@ -27,6 +27,7 @@ namespace TsuyoshiLibrary
 #if UNITY_EDITOR
                 if (_repository == null)
                 {
+                    Debug.Log(StaticAssetDataPath);
                     _repository =
                         AssetDatabase.LoadAssetAtPath<CustomTagRepository>(
                             StaticAssetDataPath);
@@ -93,6 +94,7 @@ namespace TsuyoshiLibrary
 
                 CustomTagRepository.StaticAssetDataPath = path;
                 Debug.LogError("CustomTagRepositoryが作られました");
+                Debug.LogError($"パス：{CustomTagRepository.StaticAssetDataPath}");
             }
 
             foreach (var path in movedAssets)
@@ -102,6 +104,7 @@ namespace TsuyoshiLibrary
 
                 CustomTagRepository.StaticAssetDataPath = path;
                 Debug.LogError("CustomTagRepositoryの場所が移動されました。");
+                Debug.LogError($"パス：{CustomTagRepository.StaticAssetDataPath}");
             }
         }
     }

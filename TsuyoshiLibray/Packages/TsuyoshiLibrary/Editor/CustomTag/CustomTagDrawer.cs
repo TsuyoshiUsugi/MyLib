@@ -13,7 +13,6 @@ namespace TsuyoshiLibrary
         private CustomTagCandiudatePopup toolTip;
         static private GUIContent registButton = new GUIContent("Regist", "このタグをリポジトリに登録"); //何をレンダリングするか定義する
         static private GUIStyle attentionStyle;
-        private int index = -1;
         static CustomTagDrawer()
         {
             attentionStyle = new GUIStyle(EditorStyles.textField);
@@ -56,9 +55,9 @@ namespace TsuyoshiLibrary
                     if (tag.stringValue.Length != 0)
                     {
                         // 候補のツールチップ表示
-                        var popRect = new Rect(position);
+                        var popRect = new Rect(mainArea);
                         toolTip = new CustomTagCandiudatePopup(tag.stringValue);
-                        toolTip.OpenModeless(popRect);
+                        toolTip.OpenModeless(tag, popRect);
                         // フォーカスを再設定する
                         GUI.FocusControl(focused_name);
                         lastControlForPopup = focused_name;

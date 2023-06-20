@@ -3,37 +3,40 @@ using UnityEngine;
 using UnityEditor;
 using System.Collections.Generic;
 using System.Reflection;
+using TsuyoshiLibrary;
 
 namespace TsuyoshiLibrary
 {
     public class CustomTagCandiudatePopup : PopupWindowContent
     {
-        static private GUIStyle labelStyle;
+        static private GUIStyle _labelStyle;
         static CustomTagCandiudatePopup()
         {
-            labelStyle = new GUIStyle(EditorStyles.label);
-            labelStyle.richText = true;
+            _labelStyle = new GUIStyle(EditorStyles.label);
+            _labelStyle.richText = true;
         }
-        private string currentText;
-        private List<string> candidates;
+        private string _currentText;
+        private List<string> _candidates;
+        SerializedProperty _tag;
+        float _width;
 
         public CustomTagCandiudatePopup(string currentText)
         {
             if (currentText == null || currentText.Length == 0)
             {
-                this.currentText = "";
-                candidates = new List<string>();
+                this._currentText = "";
+                _candidates = new List<string>();
             }
             else
             {
-                this.currentText = currentText;
-                candidates = CustomTagRepository.GetCandidates(currentText);
+                this._currentText = currentText;
+                _candidates = CustomTagRepository.GetCandidates(currentText);
             }
         }
 
         public override Vector2 GetWindowSize()
         {
-            return new Vector2(300, EditorGUIUtility.singleLineHeight * candidates.Count);
+            return new Vector2(_width, EditorGUIUtility.singleLineHeight * _candidates.Count);
         }
 
         /// <summary>
@@ -43,16 +46,25 @@ namespace TsuyoshiLibrary
         {
             Rect line = new Rect(rect);
             line.height = EditorGUIUtility.singleLineHeight;
-            foreach (var t in candidates)
+            foreach (var t in _candidates)
             {
-                var txt = currentText.Length == 0 ? t : t.Replace(currentText, $"<color=cyan![register.gif](https://qiita-image-store.s3.ap-northeast-1.amazonaws.com/0/75035/32561793-39f0-8408-207e-148d61fe1589.gif)>{currentText}</ color > ");
-                EditorGUI.LabelField(line, new GUIContent(txt), labelStyle);
+                var txt = _currentText.Length == 0 ? t : t.Replace(_currentText, $"<color=cyan>{_currentText}</color>");
+                EditorGUI.LabelField(line, new GUIContent(txt), _labelStyle);
+
+                if (Event.current.type == EventType.MouseDown && line.Contains(Event.current.mousePosition))
+                {
+                    _tag.stringValue= t;
+                    editorWindow.Close();
+                }
+
                 line.y += EditorGUIUtility.singleLineHeight;
             }
         }
 
-        public void OpenModeless(Rect position)
+        public void OpenModeless(SerializedProperty tag, Rect position)
         {
+            this._tag = tag;
+            _width = position.width;
             // PopupWindow.Init(activatorRect, windowContent, locationPriorityOrder, showMode, giveFocus: true);
             var method = typeof(PopupWindow).GetMethod("Init", BindingFlags.Instance | BindingFlags.NonPublic);
 
@@ -66,3 +78,4 @@ namespace TsuyoshiLibrary
         }
     }
 }
+
